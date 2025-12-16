@@ -1,12 +1,11 @@
-module github.com/nillocoelho/microservices/order
+module github.com/nillocoelho/microservices/payment
 
 go 1.24.0
 
 toolchain go1.24.11
 
 require (
-	github.com/nillocoelho/microservices-proto/golang/order v0.0.0-00010101000000-000000000000
-	github.com/nillocoelho/microservices-proto/golang/payment v0.0.0-20251216175506-f7927d35c2b1
+	github.com/nillocoelho/microservices-proto/golang/payment v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.77.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.1
@@ -23,7 +22,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
-
-replace github.com/nillocoelho/microservices-proto/golang/order => ../../microservices-proto/golang/order
 
 replace github.com/nillocoelho/microservices-proto/golang/payment => ../../microservices-proto/golang/payment

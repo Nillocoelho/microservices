@@ -23,6 +23,11 @@ func GetApplicationPort() int {
 	return port
 }
 
+func GetPaymentServiceUrl() string {
+	return get("PAYMENT_SERVICE_URL")
+}
+
+
 func get(key string) string {
 	v := os.Getenv(key)
 	if v == "" {

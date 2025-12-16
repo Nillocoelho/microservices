@@ -6,6 +6,7 @@ import (
 	"github.com/nillocoelho/microservices/order/config"
 	"github.com/nillocoelho/microservices/order/internal/adapter/db"
 	grpcAdapter "github.com/nillocoelho/microservices/order/internal/adapter/grpc"
+	payment_adapter "github.com/nillocoelho/microservices/order/internal/adapter/payment"
 	"github.com/nillocoelho/microservices/order/internal/application/core/api"
 )
 
@@ -15,7 +16,12 @@ func main() {
 		log.Fatalf("DB connection error: %v", err)
 	}
 
-	application := api.NewApplication(dbAdapter)
+	paymentAdapter, err := payment_adapter.NewAdapter(config.GetPaymentServiceUrl())
+	if err != nil {
+		log.Fatalf("Failed to initialize payment stub. Error: %v", err)
+	}
+
+	application := api.NewApplication(dbAdapter, paymentAdapter)
 
 	grpcServer := grpcAdapter.NewAdapter(application, config.GetApplicationPort())
 

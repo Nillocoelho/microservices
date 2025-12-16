@@ -6,18 +6,21 @@ import (
 )
 
 type Application struct {
-	db ports.DBPort
+	db      ports.DBPort
+	payment ports.PaymentPort
 }
 
-func NewApplication(db ports.DBPort) *Application {
-	return &Application{
-		db: db,
-	}
+func NewApplication(db ports.DBPort, payment ports.PaymentPort) *Application {
+	return &Application{db: db, payment: payment}
 }
+
 
 func (a Application) PlaceOrder(order domain.Order) (domain.Order, error) {
-	err := a.db.Save(&order)
-	if err != nil {
+	if err := a.db.Save(&order); err != nil {
+		return domain.Order{}, err
+	}
+
+	if err := a.payment.Charge(&order); err != nil {
 		return domain.Order{}, err
 	}
 
