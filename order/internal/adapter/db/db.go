@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/nillocoelho/microservices/order/internal/application/core/domain"
-	"gorm.io/driver/mysql"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -23,21 +25,35 @@ type OrderItem struct {
 	OrderID     uint
 }
 
+type Product struct {
+	gorm.Model
+	ProductCode string `gorm:"uniqueIndex"`
+	Name        string
+	Price       float32
+	Quantity    int32
+}
+
 type Adapter struct {
 	db *gorm.DB
 }
 
 func NewAdapter(dataSourceUrl string) (*Adapter, error) {
-	db, err := gorm.Open(mysql.Open(dataSourceUrl), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dataSourceUrl), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("database connection error: %v", err)
 	}
 
-	if err := db.AutoMigrate(&Order{}, &OrderItem{}); err != nil {
+	if err := db.AutoMigrate(&Order{}, &OrderItem{}, &Product{}); err != nil {
 		return nil, fmt.Errorf("migration error: %v", err)
 	}
 
 	return &Adapter{db: db}, nil
+}
+
+func (a *Adapter) ProductExists(productCode string) bool {
+	var product Product
+	result := a.db.Where("product_code = ?", productCode).First(&product)
+	return result.Error == nil
 }
 
 func (a *Adapter) Get(id string) (domain.Order, error) {
@@ -66,6 +82,13 @@ func (a *Adapter) Get(id string) (domain.Order, error) {
 }
 
 func (a *Adapter) Save(order *domain.Order) error {
+	// Validar que todos os produtos existem
+	for _, item := range order.OrderItems {
+		if !a.ProductExists(item.ProductCode) {
+			return status.Errorf(codes.NotFound, "Product with code %s not found in inventory", item.ProductCode)
+		}
+	}
+
 	var items []OrderItem
 	for _, it := range order.OrderItems {
 		items = append(items, OrderItem{

@@ -9,11 +9,13 @@ type OrderItem struct {
 }
 
 type Order struct {
-	ID         int64       `json:"id"`
-	CustomerID int64       `json:"customer_id"`
-	Status     string      `json:"status"`
-	OrderItems []OrderItem `json:"order_items"`
-	CreatedAt  int64       `json:"created_at"`
+	ID           int64       `json:"id"`
+	CustomerID   int64       `json:"customer_id"`
+	Status       string      `json:"status"`
+	OrderItems   []OrderItem `json:"order_items"`
+	CreatedAt    int64       `json:"created_at"`
+	ShippingID   int64       `json:"shipping_id"`
+	DeliveryDays int32       `json:"delivery_days"`
 }
 
 func NewOrder(customerId int64, orderItems []OrderItem) Order {

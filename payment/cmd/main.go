@@ -4,16 +4,16 @@ import (
 	"log"
 	"net"
 
+	paymentpb "github.com/nillocoelho/microservices-proto/golang/payment"
 	"github.com/nillocoelho/microservices/payment/config"
 	dbadapter "github.com/nillocoelho/microservices/payment/internal/adapter/db"
 	grpcadapter "github.com/nillocoelho/microservices/payment/internal/adapter/grpc"
 	"github.com/nillocoelho/microservices/payment/internal/application/core/api"
-	paymentpb "github.com/nillocoelho/microservices-proto/golang/payment"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	db, err := dbadapter.NewAdapter(config.GetDataSourceURL())
+	db, err := dbadapter.NewAdapter(config.GetDatabaseURL())
 	if err != nil {
 		log.Fatalf("db init error: %v", err)
 	}

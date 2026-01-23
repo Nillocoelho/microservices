@@ -10,8 +10,8 @@ func GetEnv() string {
 	return get("ENV")
 }
 
-func GetDataSourceURL() string {
-	return get("DATA_SOURCE_URL")
+func GetDatabaseURL() string {
+	return get("DATABASE_URL")
 }
 
 func GetApplicationPort() int {
@@ -27,6 +27,9 @@ func GetPaymentServiceUrl() string {
 	return get("PAYMENT_SERVICE_URL")
 }
 
+func GetShippingServiceUrl() string {
+	return get("SHIPPING_SERVICE_URL")
+}
 
 func get(key string) string {
 	v := os.Getenv(key)

@@ -13,6 +13,6 @@ func get(key string) string {
 	return val
 }
 
-func GetDataSourceURL() string      { return get("DATA_SOURCE_URL") }
-func GetApplicationPort() string    { return get("APPLICATION_PORT") }
-func GetEnvironment() string        { return get("ENV") }
+func GetDatabaseURL() string     { return get("DATABASE_URL") }
+func GetApplicationPort() string { return get("APPLICATION_PORT") }
+func GetEnvironment() string     { return get("ENV") }

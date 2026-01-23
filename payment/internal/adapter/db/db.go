@@ -2,7 +2,7 @@ package db
 
 import (
 	"github.com/nillocoelho/microservices/payment/internal/application/core/domain"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -10,8 +10,8 @@ type Adapter struct {
 	db *gorm.DB
 }
 
-func NewAdapter(dataSourceURL string) (*Adapter, error) {
-	db, err := gorm.Open(mysql.Open(dataSourceURL), &gorm.Config{})
+func NewAdapter(databaseURL string) (*Adapter, error) {
+	db, err := gorm.Open(postgres.Open(databaseURL), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

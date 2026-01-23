@@ -37,7 +37,7 @@ func (a *Adapter) Create(ctx context.Context, request *orderpb.CreateOrderReques
 		})
 	}
 
-	newOrder := domain.NewOrder(int64(request.CostumerId), items)
+	newOrder := domain.NewOrder(int64(request.CustomerId), items)
 
 	result, err := a.api.PlaceOrder(newOrder)
 	if err != nil {

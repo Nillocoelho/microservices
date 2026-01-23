@@ -8,12 +8,13 @@ import (
 )
 
 type Application struct {
-	db      ports.DBPort
-	payment ports.PaymentPort
+	db       ports.DBPort
+	payment  ports.PaymentPort
+	shipping ports.ShippingPort
 }
 
-func NewApplication(db ports.DBPort, payment ports.PaymentPort) *Application {
-	return &Application{db: db, payment: payment}
+func NewApplication(db ports.DBPort, payment ports.PaymentPort, shipping ports.ShippingPort) *Application {
+	return &Application{db: db, payment: payment, shipping: shipping}
 }
 
 func (a Application) PlaceOrder(order domain.Order) (domain.Order, error) {
@@ -38,6 +39,19 @@ func (a Application) PlaceOrder(order domain.Order) (domain.Order, error) {
 	}
 
 	order.Status = "Paid"
+
+	// Após pagamento bem-sucedido, cria a requisição de envio
+	if err := a.shipping.CreateShipping(&order); err != nil {
+		_ = a.db.UpdateStatus(order.ID, "PaymentSuccessfulShippingFailed")
+		order.Status = "PaymentSuccessfulShippingFailed"
+		return domain.Order{}, err
+	}
+
+	if err := a.db.UpdateStatus(order.ID, "Shipped"); err != nil {
+		return domain.Order{}, err
+	}
+
+	order.Status = "Shipped"
 	return order, nil
 }
 
