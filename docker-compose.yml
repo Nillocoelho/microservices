@@ -1,9 +1,12 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
     container_name: microservices-postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d microservices"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -18,50 +21,63 @@ services:
 
   payment:
     build:
-      context: .
-      dockerfile: payment/Dockerfile
-    container_name: payment-service
+      context: ..
+      dockerfile: microservices/Dockerfile
+      args:
+        SERVICE: payment
+        SERVICE_PORT: 50052
     environment:
       DATABASE_URL: "postgres://user:password@postgres:5432/payment_db?sslmode=disable"
       APPLICATION_PORT: 50052
+      ENV: development
     ports:
       - "50052:50052"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - microservices-network
 
   shipping:
     build:
-      context: .
-      dockerfile: shipping/Dockerfile
-    container_name: shipping-service
+      context: ..
+      dockerfile: microservices/Dockerfile
+      args:
+        SERVICE: shipping
+        SERVICE_PORT: 50053
     environment:
       DATABASE_URL: "postgres://user:password@postgres:5432/shipping_db?sslmode=disable"
       APPLICATION_PORT: 50053
     ports:
       - "50053:50053"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - microservices-network
 
   order:
     build:
-      context: .
-      dockerfile: order/Dockerfile
-    container_name: order-service
+      context: ..
+      dockerfile: microservices/Dockerfile
+      args:
+        SERVICE: order
+        SERVICE_PORT: 50051
     environment:
       DATABASE_URL: "postgres://user:password@postgres:5432/order_db?sslmode=disable"
       APPLICATION_PORT: 50051
       PAYMENT_SERVICE_URL: "payment:50052"
       SHIPPING_SERVICE_URL: "shipping:50053"
+      ENV: development
     ports:
       - "50051:50051"
     depends_on:
-      - postgres
-      - payment
-      - shipping
+      postgres:
+        condition: service_healthy
+      payment:
+        condition: service_started
+      shipping:
+        condition: service_started
     networks:
       - microservices-network
 
