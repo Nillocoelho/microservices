@@ -14,6 +14,7 @@ type Order struct {
 	gorm.Model
 	CustomerID int64
 	Status     string
+	TotalPrice float32
 	OrderItems []OrderItem
 }
 
@@ -76,6 +77,7 @@ func (a *Adapter) Get(id string) (domain.Order, error) {
 		ID:         int64(entity.ID),
 		CustomerID: entity.CustomerID,
 		Status:     entity.Status,
+		TotalPrice: entity.TotalPrice,
 		OrderItems: items,
 		CreatedAt:  entity.CreatedAt.Unix(),
 	}, nil
@@ -101,12 +103,14 @@ func (a *Adapter) Save(order *domain.Order) error {
 	entity := Order{
 		CustomerID: order.CustomerID,
 		Status:     order.Status,
+		TotalPrice: order.CalcTotalPrice(),
 		OrderItems: items,
 	}
 
 	res := a.db.Create(&entity)
 	if res.Error == nil {
 		order.ID = int64(entity.ID)
+		order.TotalPrice = entity.TotalPrice
 	}
 
 	return res.Error

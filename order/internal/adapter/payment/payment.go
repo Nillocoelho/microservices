@@ -45,7 +45,7 @@ func (a *Adapter) Charge(order *domain.Order) error {
 	_, err := a.payment.Create(ctx, &paymentpb.CreatePaymentRequest{
 		UserId:     order.CustomerID,
 		OrderId:    order.ID,
-		TotalPrice: order.TotalPrice(),
+		TotalPrice: order.CalcTotalPrice(),
 	})
 
 	if err != nil {

@@ -14,6 +14,7 @@ type Order struct {
 	Status       string      `json:"status"`
 	OrderItems   []OrderItem `json:"order_items"`
 	CreatedAt    int64       `json:"created_at"`
+	TotalPrice   float32     `json:"total_price"`
 	ShippingID   int64       `json:"shipping_id"`
 	DeliveryDays int32       `json:"delivery_days"`
 }
@@ -27,7 +28,7 @@ func NewOrder(customerId int64, orderItems []OrderItem) Order {
 	}
 }
 
-func (o *Order) TotalPrice() float32 {
+func (o *Order) CalcTotalPrice() float32 {
 	var total float32
 	for _, it := range o.OrderItems {
 		total += it.UnitPrice * float32(it.Quantity)
